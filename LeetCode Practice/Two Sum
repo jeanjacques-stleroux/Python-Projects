@@ -7,3 +7,5 @@ class Solution(object):
         """
     mergedString = ''
     i, j = 0, 0
+    
+
