@@ -1,1 +1,66 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+@author: stleroux
+"""
 
+"""
+
+I got curious during my FinancialEdge training so
+I created a Monte Carlo simulation of the three stocks
+we talked about
+
+"""
+
+import pandas as pd
+import pandas_datareader as pdr
+import yfinance as yf
+yf.pdr_override()
+import numpy as np
+import matplotlib.pyplot as plt
+import datetime as dt
+
+# importing data function -- tutorial as followed from QuantPy
+
+def get_data(stock, start, end):
+    
+   stock_data = yf.download(stock, start , end)
+   stock_data = stock_data['Close']
+   returns = stock_data.pct_change()
+   
+   # we want the average and covariance of returns
+   avg_returns = returns.mean()
+   covar_matrix = returns.cov()
+   return avg_returns, covar_matrix
+    
+# stock in question
+stock = ['ONON', 'NKE', 'LULU']
+
+# valuating the stock(s) up to right now
+end_dt = dt.datetime.now()
+start_dt = dt.datetime(2021, 12, 31)
+
+#get the two matrices
+avg_returns, covar_matrix = get_data(stock, start_dt, end_dt)
+
+weights = np.random.random(len(avg_returns))
+weights /= np.sum(weights)
+
+# Monte Carlo Method
+mc_sims = 400 # number of simulations
+T = 100 #timeframe in days
+meanM = np.full(shape=(T, len(weights)), fill_value=avg_returns)
+meanM = meanM.T
+portfolio_sims = np.full(shape=(T, mc_sims), fill_value=0.0)
+initialPortfolio = 10000
+for m in range(0, mc_sims):
+    Z = np.random.normal(size=(T, len(weights)))#uncorrelated RV's
+    L = np.linalg.cholesky(covar_matrix) #Cholesky decomposition to Lower Triangular Matrix
+    dailyReturns = meanM + np.inner(L, Z) #Correlated daily returns for individual stocks
+    portfolio_sims[:,m] = np.cumprod(np.inner(weights, dailyReturns.T)+1)*initialPortfolio
+plt.plot(portfolio_sims)
+plt.ylabel('Value ($)')
+plt.xlabel('Days')
+plt.title('MC simulation of a ONON, Nike, LuLuLemon portfolio')
+plt.show()
+    
