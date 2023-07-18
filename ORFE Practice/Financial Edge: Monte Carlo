@@ -46,18 +46,22 @@ avg_returns, covar_matrix = get_data(stock, start_dt, end_dt)
 weights = np.random.random(len(avg_returns))
 weights /= np.sum(weights)
 
-# Monte Carlo Method
-mc_sims = 400 # number of simulations
-T = 100 #timeframe in days
+# Monte Carlo Method with 400 sims
+# Also under study by QuantPy
+
+mc_sims = 400
+T = 100 # timef in days
 meanM = np.full(shape=(T, len(weights)), fill_value=avg_returns)
 meanM = meanM.T
 portfolio_sims = np.full(shape=(T, mc_sims), fill_value=0.0)
 initialPortfolio = 10000
+
 for m in range(0, mc_sims):
-    Z = np.random.normal(size=(T, len(weights)))#uncorrelated RV's
-    L = np.linalg.cholesky(covar_matrix) #Cholesky decomposition to Lower Triangular Matrix
-    dailyReturns = meanM + np.inner(L, Z) #Correlated daily returns for individual stocks
+    Z = np.random.normal(size=(T, len(weights))) # Uncorrelated RV's
+    L = np.linalg.cholesky(covar_matrix) # Cholesky decomposition
+    dailyReturns = meanM + np.inner(L, Z) # Correlated daily returns for individual stocks
     portfolio_sims[:,m] = np.cumprod(np.inner(weights, dailyReturns.T)+1)*initialPortfolio
+
 plt.plot(portfolio_sims)
 plt.ylabel('Value ($)')
 plt.xlabel('Days')
