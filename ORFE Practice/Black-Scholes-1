@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+@author: stleroux
+"""
+
+from scipy.stats import norm
+import numpy as np
+
+# input variables into model
+# this version uses try/catch
+
+print("Enter interest, asset val, stike price, sigma as two point decimal vals.")
+print("Enter time as an integer.")
+try:
+    interest_rate = round(float(input("Enter interest rate: ")), 2)
+    under_ast = round(float(input("Enter underlying asset price: ")), 2)
+    strike_price = round(float(input("Enter strike price: ")), 2)
+    time = int(input("Enter time to expiration in days: "))
+    sigma_vol = round(float(input("Enter volatility (sigma): ")), 2)
+except ValueError:
+    print("Invalid input. Please enter:\n"
+          "- A valid numeric value for interest rate, underlying\n"
+          "  price, strike price, and sigma (rounded to 2 decimal\n"
+          "  places).\n"
+          "- An integer value for time to expiration.")
+
+# black scholes function, not including the merton extension
+
+def black_scholes(interest_rate, under_ast, strike_price, time, sigma_vol, 
+                  call_put='C'):
+    
+    # calculating d1 and d2
+    
+    d1 = (np.log(under_ast/strike_price) + interest_rate + sigma_vol**2/2 
+          * time) / sigma_vol * np.sqrt(time)
+    d2 = d1 - sigma_vol * np.sqrt(time)
+    
+    # discounted strike price variable for convenience
+    disc = strike_price * np.exp(-interest_rate*time)
+    
+    try:
+        if type == 'C':
+            
+            """
+            if call option, price is probability option will be profitable at 
+            expiration -- calculated as difference between ev of stock price at 
+            expiration (d1) and risk-free interest strike price (d2)
+            
+            """
+            price = norm.cdf(d1, 0, 1) - disc * norm.cdf(d2, 0, 1)
+            
+        elif type == 'P':
+            
+            """
+            if put option, price is probability option will be profitable at 
+            expiration -- calculated as the discounted expected value of 
+            strike price (d2) minus the discounted current value of the stock price (d1). 
+            the discounted values consider the risk-free interest rate
+             
+            """
+            
+            strike_price * np.exp(-interest_rate*time)
+            price = disc * norm.cdf(-d2, 0, 1) - sigma_vol * norm.cdf(-d1, 0, 1)
+        
+        return price
+            
+    except:
+        print("C for call option, P for put option.")
+    
+
+print("Option price is: ", round(black_scholes(interest_rate, under_ast, 
+                                               strike_price, time, 
+                                               sigma_vol)), 2)
