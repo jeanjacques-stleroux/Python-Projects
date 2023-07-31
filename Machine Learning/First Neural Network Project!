@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+@author: stleroux
+"""
+
 # Credits to Stanford University, DeepLearning.AI for providing the framework for the Python Code
 # Project: Tensorflow neural network to detect whether handwriting is a '0' or '1'
 # Grade earned on project: 100%
