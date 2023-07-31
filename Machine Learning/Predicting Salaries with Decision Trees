@@ -74,9 +74,27 @@ print("Train: ", train_acc) #0.97137
 
 y_train_pred = clf.predict(X_test)
 train_acc = accuracy_score(y_test, y_test_pred)
-print("Train: ", train_acc) #0.77871
+print("Test: ", test_acc) #0.77871
 
-#prune the decision tree
+#pruning the decision tree
 #once again, trust me the dataset was assessed for balance ;) 
 
+sizes = [2, 3, 5, 10, 20, 50, 100, 250, 750, 1000, 2500, 5000, 10000, 15000]
+for size in sizes:
+  clf = DecisionTreeClassifier(random_state=0, criterion='entropy', min_samples_split=s)
+  clf.fit(X_train, y_train)
 
+  y_train_pred = clf.predict(X_train)
+  train_acc = accuracy_score(y_train, y_train_pred)
+
+  y_train_pred = clf.predict(X_test)
+  train_acc = accuracy_score(y_test, y_test_pred)
+
+  train_accs.append(train_acc)
+  test_accs.append(test_acc)
+
+plt.plot(sizes) #plotting train/test set while 
+
+fig = plt.figure(figsize=(40,40))
+p = tree.plot_tree(clf, filled=True, feature_names=X_train.columns.to_list(), class_names=("low", "high"))
+fig.savefig("natureiscool.png") 
