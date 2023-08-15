@@ -60,7 +60,6 @@ def black_scholes(interest_rate, under_ast, strike_price, time, sigma_vol,
              
             """
             
-            strike_price * np.exp(-interest_rate*time)
             price = disc * norm.cdf(-d2, 0, 1) - sigma_vol * norm.cdf(-d1, 0, 1)
         
         return price
